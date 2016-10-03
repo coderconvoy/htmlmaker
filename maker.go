@@ -4,14 +4,18 @@ type Tag struct {
 	TType    string
 	Attrs    map[string]string
 	Children []*Tag
-	innerT   string
+	Inner    string
 }
 
 func NewTag(kind string, s ...string) *Tag {
 	res := &Tag{kind, make(map[string]string), make([]*Tag, 0), ""}
 	i := 0
-	for i = 0; i+1 < len(s); i += 2 {
+	ls := len(s)
+	for i = 0; i+1 < ls; i += 2 {
 		res.Attrs[s[i]] = s[i+1]
+	}
+	if ls%2 == 1 {
+		res.Inner = s[ls-1]
 	}
 	return res
 
@@ -25,7 +29,7 @@ func Childless(ttype string) bool {
 	if ttype == "br" {
 		return true
 	}
-	if ttype == "image" {
+	if ttype == "img" {
 		return true
 	}
 	return false
@@ -45,14 +49,15 @@ func (self *Tag) toString(pre string) string {
 		return res + "\n"
 	}
 
+	res += self.Inner
+
 	if len(self.Children) > 0 {
 		res += "\n"
-	}
-	for i := 0; i < len(self.Children); i++ {
-		res += self.Children[i].toString(pre + " ")
 
-	}
-	if len(self.Children) > 1 {
+		for i := 0; i < len(self.Children); i++ {
+			res += self.Children[i].toString(pre + " ")
+
+		}
 		res += pre
 	}
 	res += "</" + self.TType + ">\n"
