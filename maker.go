@@ -21,7 +21,7 @@ func NewTag(kind string, s ...string) *Tag {
 
 }
 
-func (self *Tag) addChildren(ts ...*Tag) {
+func (self *Tag) AddChildren(ts ...*Tag) {
 	self.Children = append(self.Children, ts...)
 }
 
