@@ -9,15 +9,21 @@ type Tag struct {
 
 func NewTag(kind string, s ...string) *Tag {
 	res := &Tag{kind, make(map[string]string), make([]*Tag, 0), ""}
-	i := 0
+	res.AddAttrs(s...)
+	return res
+
+}
+
+//AddAttrs is a function for the super lazy.
+//Simply strings are paired as k-v, odds at the end become innerHTML
+func (self *Tag) AddAttrs(s ...string) {
 	ls := len(s)
-	for i = 0; i+1 < ls; i += 2 {
-		res.Attrs[s[i]] = s[i+1]
+	for i := 0; i+1 < ls; i += 2 {
+		self.Attrs[s[i]] = s[i+1]
 	}
 	if ls%2 == 1 {
-		res.Inner = s[ls-1]
+		self.Inner = s[ls-1]
 	}
-	return res
 
 }
 
