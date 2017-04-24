@@ -11,6 +11,47 @@ func NewTag(kind string, s ...string) *Tag {
 	res := &Tag{kind, make(map[string]string), make([]*Tag, 0), ""}
 	res.AddAttrs(s...)
 	return res
+}
+
+func NewTextTag(kind string, inner string, s ...string) *Tag {
+	res := &Tag{kind, make(map[string]string), make([]*Tag, 0), inner}
+	res.AddAttrs(s...)
+	return res
+}
+
+func NewText(s string) *Tag {
+	return &Tag{
+		TType: "text",
+		Inner: s,
+	}
+}
+
+// NewPage takes the standard requests, for a page, and returns a page object
+//Optional string Params:
+//title - The page title
+//css - coma separated links to css,
+//js - coma separated links to js,
+//return the top page object, and the body
+func NewPage(ss ...string) (*Tag, *Tag) {
+	//fill params
+	title, css, js = "", "", ""
+	if len(ss) > 0 {
+		title = ss[0]
+	}
+	if len(ss) > 1 {
+		css = ss[1]
+	}
+	if len(ss) > 2 {
+		js = ss[2]
+	}
+
+	//create bases
+	dt := NewTag("DOCTYPE", "html")
+	mh := NewTag("html")
+	mh.AddChildren(
+		NewTextTag("title", title),
+		NewTag("meta", "charset", "utf-8"),
+	)
 
 }
 
