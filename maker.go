@@ -2,27 +2,32 @@ package htmlmaker
 
 import "strings"
 
+type Attr struct {
+	Name string
+	Val  string
+}
+
 type Tag struct {
 	TType    string
-	Attrs    map[string]string
+	Attrs    []Attr
 	Children []*Tag
 	Inner    string
 }
 
 func NewTag(kind string, s ...string) *Tag {
-	res := &Tag{kind, make(map[string]string), make([]*Tag, 0), ""}
+	res := &Tag{kind, []Attr{}, make([]*Tag, 0), ""}
 	res.AddAttrs(s...)
 	return res
 }
 
 func NewParent(kind string, children []*Tag, s ...string) *Tag {
-	res := &Tag{kind, make(map[string]string), children, ""}
+	res := &Tag{kind, []Attr{}, children, ""}
 	res.AddAttrs(s...)
 	return res
 }
 
 func NewTextTag(kind string, inner string, s ...string) *Tag {
-	res := &Tag{kind, make(map[string]string), make([]*Tag, 0), inner}
+	res := &Tag{kind, []Attr{}, make([]*Tag, 0), inner}
 	res.AddAttrs(s...)
 	return res
 }
@@ -76,13 +81,25 @@ func NewPage(ss ...string) (*Tag, *Tag) {
 
 //AddAttrs is a function for the super lazy.
 //Simply strings are paired as k-v, Odds at the end, become unstrung
-func (self *Tag) AddAttrs(s ...string) {
+func (t *Tag) AddAttrs(s ...string) {
 	ls := len(s)
+
 	for i := 0; i+1 < ls; i += 2 {
-		self.Attrs[s[i]] = s[i+1]
+		added := false
+		for _, v := range t.Attrs {
+			if v.Name == s[i] {
+				v.Val = s[i+1]
+				added = true
+				break
+			}
+		}
+		if !added {
+			t.Attrs = append(t.Attrs, Attr{s[i], s[i+1]})
+		}
+
 	}
 	if ls%2 == 1 {
-		self.Attrs[s[len(s)-1]] = ""
+		t.Attrs = append(t.Attrs, Attr{s[len(s)-1], ""})
 	}
 
 }
@@ -107,16 +124,18 @@ func (self *Tag) String() string {
 
 func (self *Tag) toString(pre string) string {
 	res := ""
+	pre2 := pre
 	if self.TType != "page" {
 		res = pre + "<" + self.TType
-		for k, v := range self.Attrs {
-			if v == "" {
-				res += " " + k
+		for _, v := range self.Attrs {
+			if v.Val == "" {
+				res += " " + v.Name
 				continue
 			}
-			res += " " + k + "=" + "\"" + v + "\""
+			res += " " + v.Name + "=" + "\"" + v.Val + "\""
 		}
 		res += ">"
+		pre2 = pre + " "
 	}
 	if Childless(self.TType) {
 		return res + "\n"
@@ -128,8 +147,7 @@ func (self *Tag) toString(pre string) string {
 		res += "\n"
 
 		for i := 0; i < len(self.Children); i++ {
-			res += self.Children[i].toString(pre + " ")
-
+			res += self.Children[i].toString(pre2)
 		}
 		res += pre
 	}
