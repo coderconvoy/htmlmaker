@@ -20,7 +20,7 @@ func (t *Tag) GetFirst(f TagFilter, maxD int) *Tag {
 }
 
 func (t *Tag) GetAll(f TagFilter, maxD int) []*Tag {
-	res = []*Tag{}
+	res := []*Tag{}
 	if f(t) {
 		res = append(res, t)
 	}
@@ -34,13 +34,30 @@ func (t *Tag) GetAll(f TagFilter, maxD int) []*Tag {
 	return res
 }
 
-func (t *Tag) GetElementById(id string, md int) *Tag {
-	return t.GetFirst(func(t *Tag) bool {
+func ByAnd(tfs ...TagFilter) TagFilter {
+	return func(t *Tag) bool {
+		for _, f := range tfs {
+			if !f(t) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+func ByAttr(k, v string) TagFilter {
+	return func(t *Tag) bool {
 		for _, a := range t.Attrs {
-			if a.Name == "id" && a.Val == id {
+			if a.Name == k && a.Val == v {
 				return true
 			}
 		}
 		return false
-	}, md)
+	}
+}
+
+func ByType(tp string) TagFilter {
+	return func(t *Tag) bool {
+		return t.TType == tp
+	}
 }
