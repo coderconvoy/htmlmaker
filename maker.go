@@ -110,7 +110,7 @@ func (self *Tag) AddChildren(ts ...*Tag) {
 
 func Childless(ttype string) bool {
 	ttype = strings.ToLower(ttype)
-	childless := []string{"br", "img", "meta", "!doctype"}
+	childless := []string{"input", "br", "img", "meta", "!doctype"}
 	for _, s := range childless {
 		if s == ttype {
 			return true
