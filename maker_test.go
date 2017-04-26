@@ -36,8 +36,8 @@ func Test_GetBy(t *testing.T) {
 	}
 
 	red := p.GetFirst(ByAttr("href", "popop.css"), -1)
-	if red.Attrs[2].Val != "popop.css" {
-		t.Log("third element should be popop.css")
+	if r, _ := red.Attr("href"); r != "popop.css" {
+		t.Log("href of red element should be popop.css")
 		t.Fail()
 	}
 

@@ -82,6 +82,15 @@ func NewPage(ss ...string) (*Tag, *Tag) {
 
 }
 
+func (t *Tag) Attr(k string) (string, bool) {
+	for _, el := range t.Attrs {
+		if el.Name == k {
+			return el.Val, true
+		}
+	}
+	return EMPTY, false
+}
+
 func (t *Tag) SetAttr(k, v string) {
 	for _, el := range t.Attrs {
 		if el.Name == k {
