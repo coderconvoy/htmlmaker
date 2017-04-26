@@ -7,6 +7,9 @@ type Attr struct {
 	Val  string
 }
 
+//Use this to specify an empty boolean attribute
+const EMPTY = "\\nil"
+
 type Tag struct {
 	TType    string
 	Attrs    []Attr
@@ -79,27 +82,39 @@ func NewPage(ss ...string) (*Tag, *Tag) {
 
 }
 
+func (t *Tag) SetAttr(k, v string) {
+	for _, el := range t.Attrs {
+		if el.Name == k {
+			el.Val = v
+			return
+		}
+	}
+	t.Attrs = append(t.Attrs, Attr{k, v})
+}
+
 //AddAttrs is a function for the super lazy.
-//Simply strings are paired as k-v, Odds at the end, become unstrung
+//Use "--" to indicate check true
 func (t *Tag) AddAttrs(s ...string) {
 	ls := len(s)
 
-	for i := 0; i+1 < ls; i += 2 {
-		added := false
-		for _, v := range t.Attrs {
-			if v.Name == s[i] {
-				v.Val = s[i+1]
-				added = true
-				break
+	mode := 0
+	atname := ""
+	for i := 0; i < ls; i++ {
+		if mode == 0 {
+			//New Variable name
+			if strings.HasPrefix(s[i], "--") {
+				s := strings.TrimPrefix(s[i], "--")
+				t.SetAttr(s, EMPTY)
+				continue
 			}
+			atname = s[i]
+			mode = 1
+			continue
 		}
-		if !added {
-			t.Attrs = append(t.Attrs, Attr{s[i], s[i+1]})
-		}
+		//mode == 1 no add attr
+		t.SetAttr(atname, s[i])
+		mode = 0
 
-	}
-	if ls%2 == 1 {
-		t.Attrs = append(t.Attrs, Attr{s[len(s)-1], ""})
 	}
 
 }
@@ -128,7 +143,7 @@ func (self *Tag) toString(pre string) string {
 	if self.TType != "page" {
 		res = pre + "<" + self.TType
 		for _, v := range self.Attrs {
-			if v.Val == "" {
+			if v.Val == EMPTY {
 				res += " " + v.Name
 				continue
 			}
@@ -156,5 +171,4 @@ func (self *Tag) toString(pre string) string {
 	}
 
 	return res
-
 }
