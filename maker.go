@@ -62,7 +62,7 @@ func NewPage(ss ...string) (*Tag, *Tag) {
 	}
 
 	//create bases
-	dt := NewTag("!DOCTYPE", "html")
+	dt := NewTag("!DOCTYPE", "--html")
 	mh := NewTag("html")
 	head := NewTag("head")
 	body := NewTag("body")
@@ -149,7 +149,7 @@ func (self *Tag) String() string {
 func (self *Tag) toString(pre string) string {
 	res := ""
 	pre2 := pre
-	if self.TType != "page" {
+	if self.TType != "page" && self.TType != "text" {
 		res = pre + "<" + self.TType
 		for _, v := range self.Attrs {
 			if v.Val == EMPTY {
@@ -175,7 +175,7 @@ func (self *Tag) toString(pre string) string {
 		}
 		res += pre
 	}
-	if self.TType != "page" {
+	if self.TType != "page" && self.TType != "text" {
 		res += "</" + self.TType + ">\n"
 	}
 

@@ -21,7 +21,7 @@ func QSelect(name string, options ...string) *Tag {
 }
 
 func QInput(ttype, name string, options ...string) *Tag {
-	return NewTag("input", append(options, "name", name, "type", ttype)...)
+	return NewTag("input", append(options, "type", ttype, "name", name)...)
 }
 
 func QSubmit(text string) *Tag {
@@ -30,4 +30,16 @@ func QSubmit(text string) *Tag {
 
 func QForm(action string, chids []*Tag, options ...string) *Tag {
 	return NewParent("form", chids, append(options, "method", "post", "action", action)...)
+}
+
+func QMulti(ptype, ttype string, chids ...string) *Tag {
+	ops := []*Tag{}
+	for _, v := range chids {
+		ops = append(ops, NewTextTag(ttype, v))
+	}
+	return NewParent(ptype, ops)
+}
+
+func (t *Tag) Wrap(ttype string, ss ...string) *Tag {
+	return NewParent(ttype, []*Tag{t}, ss...)
 }
